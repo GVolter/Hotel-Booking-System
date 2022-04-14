@@ -1,10 +1,9 @@
-package services;
+package com.company.services;
 
-import model.app.App;
-import model.hotel.Hotel;
-import model.reservation.Reservation;
-import model.room.Room;
-import model.user.Customer;
+import com.company.model.hotel.Hotel;
+import com.company.model.reservation.Reservation;
+import com.company.model.room.Room;
+import com.company.model.user.Customer;
 
 import java.util.*;
 
@@ -17,14 +16,24 @@ public class ReservationService {
         return instance;
     }
 
+    private List<Reservation> reservations = new ArrayList<>();
+
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
+    }
+
     private final Scanner scanner  = new Scanner(System.in);
 
     CustomerService customerService = CustomerService.getInstance();
 
-    public void reserve(App app, Customer customer, Hotel hotel) {
+    public void reserve(Customer customer, Hotel hotel) {
         System.out.println("Show Rooms");
         for (Room room : hotel.getRooms()) {
-            if (room.getStatus().equals("Available"))
+            if (room.isAvailable())
                 System.out.println(room);
         }
         System.out.println("Pick duration (number of days)");
@@ -34,14 +43,16 @@ public class ReservationService {
             System.out.println("Enter room you want to book");
             int roomNo = scanner.nextInt();
             for (Room r : hotel.getRooms()) {
-                if (r.getNoOfRoom() == roomNo && r.getStatus().equals("Available")) {
+                if (r.getRoomNo() == roomNo && r.isAvailable()) {
                     roomsToBook.put(r, days);
-                    r.setStatus("Booked");
+                    r.setAvailable(false);
                     System.out.println("Room booked " + roomNo);
                     break;
                 }
-                else
+                else {
                     System.out.println("Room can't be booked");
+                    break;
+                }
             }
             System.out.println("Add another room? (Y/N)");
             String input = scanner.next();
@@ -50,19 +61,19 @@ public class ReservationService {
         }
         Reservation reservation = new Reservation(hotel, customer, roomsToBook);
         double price = calculateReservationPrice(reservation);
-        for(;;) {
+        while(true) {
             System.out.println("Price for reservation will be " + price);
             System.out.println("Create reservation? (Y/N)");
             String option = scanner.next();
             if (option.equals("Y")) {
-                app.getReservations().add(reservation);
-                customerService.displayMenu(app, customer);
+                getReservations().add(reservation);
+                customerService.displayMenu(customer);
             } else if (option.equals("N")) {
                 System.out.println("Reservation canceled");
                 for (Map.Entry<Room, Integer> entry : reservation.getBookedRooms().entrySet()) {
-                    entry.getKey().setStatus("Available");
+                    entry.getKey().setAvailable(true);
                 }
-                customerService.displayMenu(app, customer);
+                customerService.displayMenu(customer);
             } else {
                 System.out.println("Invalid input");
             }

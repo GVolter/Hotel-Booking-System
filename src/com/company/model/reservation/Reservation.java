@@ -1,12 +1,9 @@
-package model.reservation;
+package com.company.model.reservation;
 
-import model.hotel.*;
-import model.room.*;
-import model.user.*;
+import com.company.model.hotel.*;
+import com.company.model.room.*;
+import com.company.model.user.*;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.Map;
 
 public class Reservation {

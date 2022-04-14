@@ -1,25 +1,27 @@
-package model.user;
-
-import java.util.Objects;
+package com.company.model.user;
 
 public abstract class User {
-    private static int ID = 0;
+    private static int id_max = 0;
     private int id;
-    protected String firstName;
-    protected String lastName;
-    protected String username;
-    protected String email;
-    protected String password;
-    protected String access = "not blocked";
+    private String firstName;
+    private String lastName;
+    private String username;
+    private String email;
+    private String password;
+    private boolean isBlocked = false ;
 
     public User(String firstName, String lastName, String username, String email, String password) {
-        ID++;
-        this.id = ID;
+        id_max++;
+        this.id = id_max;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getFirstName() {
@@ -62,22 +64,12 @@ public abstract class User {
         this.password = password;
     }
 
-    public String getAccess() {
-        return access;
+    public boolean isBlocked() {
+        return isBlocked;
     }
 
-    public void setAccess(String access) {
-        this.access = access;
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                '}';
-    }
 }

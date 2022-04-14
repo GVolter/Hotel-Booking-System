@@ -1,4 +1,4 @@
-package model.hotel;
+package com.company.model.hotel;
 
 import java.util.Comparator;
 

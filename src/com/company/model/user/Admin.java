@@ -1,4 +1,4 @@
-package model.user;
+package com.company.model.user;
 
 public class Admin extends User{
     public Admin(String firstName, String lastName, String username, String email, String password) {
@@ -8,10 +8,11 @@ public class Admin extends User{
     @Override
     public String toString() {
         return "Admin{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
+                "id=" + getId() +
+                ", firstName='" + getFirstName() + '\'' +
+                ", lastName='" + getLastName() + '\'' +
+                ", username='" + getUsername() + '\'' +
+                ", email='" + getEmail() + '\'' +
                 '}';
     }
 }

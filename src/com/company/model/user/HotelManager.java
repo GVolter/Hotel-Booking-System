@@ -1,6 +1,6 @@
-package model.user;
+package com.company.model.user;
 
-import model.hotel.Hotel;
+import com.company.model.hotel.Hotel;
 
 public class HotelManager extends User{
     private Hotel hotel;
@@ -20,12 +20,13 @@ public class HotelManager extends User{
 
     @Override
     public String toString() {
-        return "HotelManager{" +
-                "hotel=" + hotel +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
+        return "Hotel Manager{" +
+                "id=" + getId() +
+                ", firstName='" + getFirstName() + '\'' +
+                ", lastName='" + getLastName() + '\'' +
+                ", username='" + getUsername() + '\'' +
+                ", email='" + getEmail() + '\'' +
+                ", hotel='" + hotel + '\'' +
                 '}';
     }
 }

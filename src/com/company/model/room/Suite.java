@@ -1,10 +1,10 @@
-package model.room;
+package com.company.model.room;
 
 public class Suite extends Room{
     private int noOfRooms;
 
-    public Suite(int noOfRoom, int noOfBeds, int roomFloor, double price, int noOfRooms) {
-        super(noOfRoom, noOfBeds, roomFloor, price);
+    public Suite(int roomNo, int roomFloor, double price, int noOfRooms) {
+        super(roomNo, roomFloor, price);
         this.noOfRooms = noOfRooms;
     }
 
@@ -19,11 +19,10 @@ public class Suite extends Room{
     @Override
     public String toString() {
         return "Suite{" +
-                "status='" + status + '\'' +
-                ", noOfRoom=" + noOfRoom +
-                ", noOfBeds=" + noOfBeds +
-                ", roomFloor=" + roomFloor +
-                ", price=" + price +
+                "status='" + isAvailable() + '\'' +
+                ", noOfRoom=" + getRoomNo() +
+                ", roomFloor=" + getRoomFloor() +
+                ", price=" + getPrice() +
                 ", noOfRooms=" + noOfRooms +
                 '}';
     }
