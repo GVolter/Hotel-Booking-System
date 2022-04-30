@@ -1,7 +1,10 @@
 package com.company.services;
+import com.company.model.hotel.Hotel;
 import com.company.model.room.Room;
 import com.company.model.user.HotelManager;
 
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Scanner;
 
 public class HotelManagerService {
@@ -12,6 +15,11 @@ public class HotelManagerService {
     public static HotelManagerService getInstance() {
         return instance;
     }
+
+    private final Path PATH = Path.of("resources/hotelManagers.csv");
+
+    private CSVReader<HotelManager> hotelManagerCSVReader = new CSVReader<>();
+    private CSVWriter<HotelManager> hotelManagerCSVWriter = new CSVWriter<>(PATH);
 
     private final Scanner scanner = new Scanner(System.in);
     RoomService roomService = RoomService.getInstance();
@@ -58,4 +66,13 @@ public class HotelManagerService {
             }
         }
     }
+
+    public List<HotelManager> readHotelManagers() {
+        return hotelManagerCSVReader.read(PATH);
+    }
+
+    public void write(HotelManager hotelManager) {
+        hotelManagerCSVWriter.write(hotelManager);
+    }
+
 }

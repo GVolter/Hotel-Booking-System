@@ -3,6 +3,7 @@ package com.company.services;
 import com.company.model.hotel.Hotel;
 import com.company.model.user.Customer;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Scanner;
 
@@ -14,6 +15,11 @@ public class CustomerService {
     public static CustomerService getInstance() {
         return instance;
     }
+
+    private final Path PATH = Path.of("resources/customers.csv");
+
+    private CSVReader<Customer> customerCSVReader = new CSVReader<>();
+    private CSVWriter<Customer> customerCSVWriter = new CSVWriter<>(PATH);
 
     private final Scanner scanner  = new Scanner(System.in);
     LoginService loginService = LoginService.getInstance();
@@ -42,16 +48,18 @@ public class CustomerService {
                         System.out.println(hotel);
                     break;
                 case 2:
-                    System.out.println("Choose Hotel");
-                    String choosenHotel = scanner.next();
-                    for(Hotel hotel: hotelService.getHotels()) {
-                        if(choosenHotel.equals(hotel.getName())) {
-                            ReservationService reservationService = ReservationService.getInstance();
-                            reservationService.reserve(customer, hotel);
+                    while (true) {
+                        System.out.println("Choose Hotel");
+                        String chosenHotel = scanner.next();
+                        for (Hotel hotel : hotelService.getHotels()) {
+                            if (chosenHotel.equals(hotel.getName())) {
+                                ReservationService reservationService = ReservationService.getInstance();
+                                reservationService.reserve(customer, hotel);
+                                break;
+                            }
                         }
+                        System.out.println("No hotel was found with this name");
                     }
-                    System.out.println("No hotel was found with this name");
-                    break;
                 case 3:
                     loginService.displayMenu();
                     break;
@@ -73,5 +81,13 @@ public class CustomerService {
                     System.out.println("Invalid option");
             }
         }
+    }
+
+    public List<Customer> readCustomers() {
+        return customerCSVReader.read(PATH);
+    }
+
+    public void write(Customer customer) {
+        customerCSVWriter.write(customer);
     }
 }

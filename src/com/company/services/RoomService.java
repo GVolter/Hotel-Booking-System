@@ -6,6 +6,9 @@ import com.company.model.room.StandardRoomType;
 import com.company.model.room.Room;
 import com.company.model.room.Suite;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class RoomService {
@@ -17,7 +20,28 @@ public class RoomService {
         return instance;
     }
 
+    List<Room> rooms = new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
+
+    AuditService auditService = AuditService.getInstance();
+
+    private final Path SROOM_PATH = Path.of("resources/standardRooms.csv");
+
+    private CSVReader<StandardRoom> standardRoomCSVReader = new CSVReader<>();
+    private CSVWriter<StandardRoom> standardRoomCSVWriter = new CSVWriter<>(SROOM_PATH);
+
+    private final Path SUITE_PATH = Path.of("resources/suites.csv");
+
+    private CSVReader<Suite> suiteCSVReader = new CSVReader<>();
+    private CSVWriter<Suite> suiteCSVWriter = new CSVWriter<>(SUITE_PATH);
+
+    public List<Room> getRooms() {
+        return rooms;
+    }
+
+    public void setRooms(List<Room> rooms) {
+        this.rooms = rooms;
+    }
 
     public Room createRoom(int roomNo) {
         int option;
@@ -25,22 +49,46 @@ public class RoomService {
             int roomFloor;
             double price;
             StandardRoomType type = null;
-            try {
-                System.out.println("Enter Room Information: ");
-                System.out.println("Enter floor number: ");
-                roomFloor = scanner.nextInt();
-                System.out.println("Enter price: ");
-                price = scanner.nextDouble();
-                System.out.println("Enter type for room of kind StandardRoom or skip if it is a Suite (1, 2, 3, 4):");
-                System.out.println("1. Single");
-                System.out.println("2. Double");
-                System.out.println("3. Triple");
-                System.out.println("4. Skip");
-                option = scanner.nextInt();
-            } catch (Exception e) {
-                System.out.println("Invalid option");
-                scanner.nextLine();
-                continue;
+            System.out.println("Enter Room Information: ");
+            System.out.println("Enter floor number: ");
+            while (true)
+            {
+                try {
+                    roomFloor = scanner.nextInt();
+                    break;
+                }
+                catch(Exception e) {
+                    System.out.println("Invalid option");
+                    scanner.nextLine();
+                }
+            }
+            System.out.println("Enter price: ");
+            while (true)
+            {
+                try {
+                    price = scanner.nextDouble();
+                    break;
+                }
+                catch(Exception e) {
+                    System.out.println("Invalid option");
+                    scanner.nextLine();
+                }
+            }
+            System.out.println("Enter type for room of kind StandardRoom or skip if it is a Suite (1, 2, 3, 4):");
+            System.out.println("1. Single");
+            System.out.println("2. Double");
+            System.out.println("3. Triple");
+            System.out.println("4. Skip");
+            while (true)
+            {
+                try {
+                    option = scanner.nextInt();
+                    break;
+                }
+                catch(Exception e) {
+                    System.out.println("Invalid option");
+                    scanner.nextLine();
+                }
             }
             switch (option) {
                 case 1:
@@ -59,13 +107,31 @@ public class RoomService {
             }
             if (type == null) {
                 System.out.println("Enter number of rooms for Suite:");
-                int noOfRooms = scanner.nextInt();
+                int noOfRooms;
+                while (true)
+                {
+                    try {
+                        noOfRooms = scanner.nextInt();
+                        break;
+                    }
+                    catch(Exception e) {
+                        System.out.println("Invalid option");
+                        scanner.nextLine();
+                    }
+                }
                 System.out.println("Room Added");
-                return new Suite(roomNo, roomFloor, price, noOfRooms);
+                Suite suite = new Suite(roomNo, roomFloor, price, noOfRooms);
+                write(suite);
+                auditService.logMessage("Room added in systen");
+                return suite;
             } else {
                 System.out.println("Room Added");
-                return new StandardRoom(roomNo, roomFloor, price, type);
+                StandardRoom standardRoom = new StandardRoom(roomNo, roomFloor, price, type);
+                write(standardRoom);
+                auditService.logMessage("Room added in systen");
+                return standardRoom;
             }
+
         }
     }
 
@@ -100,5 +166,21 @@ public class RoomService {
             System.out.println("Room not found!");
         }
         System.out.println("There are no rooms");
+    }
+
+    public List<StandardRoom> readStandardRooms() {
+        return standardRoomCSVReader.read(SROOM_PATH);
+    }
+
+    public void write(StandardRoom standardRoom) {
+        standardRoomCSVWriter.write(standardRoom);
+    }
+
+    public List<Suite> readSuites() {
+        return suiteCSVReader.read(SUITE_PATH);
+    }
+
+    public void write(Suite suite) {
+        suiteCSVWriter.write(suite);
     }
 }
