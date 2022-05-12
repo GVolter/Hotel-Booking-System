@@ -61,10 +61,11 @@ public class CSVReader<T> {
         return objects;
     }
 
-    private List<Customer> readCustomers(BufferedReader reader) throws IOException {
+    private List<Customer> readCustomers(BufferedReader bufferedReader) throws IOException {
         List<Customer> customers = new ArrayList<>();
+        bufferedReader.readLine();
         String line;
-        while ((line = reader.readLine()) != null) {
+        while ((line = bufferedReader.readLine()) != null) {
             String[] information = line.split(",");
             Customer customer = new Customer(information[0], information[1], information[2], information[3], information[4]);
             customers.add(customer);
@@ -74,6 +75,7 @@ public class CSVReader<T> {
 
     private List<StandardRoom> readStandardRooms(BufferedReader bufferedReader) throws IOException {
         List<StandardRoom> standardRooms = new ArrayList<>();
+        bufferedReader.readLine();
         String line;
         while ((line = bufferedReader.readLine()) != null) {
             StandardRoomType type;
@@ -96,6 +98,7 @@ public class CSVReader<T> {
     private List<Suite> readSuites(BufferedReader bufferedReader) throws IOException
     {
         List<Suite> suites = new ArrayList<>();
+        bufferedReader.readLine();
         String line;
         while ((line = bufferedReader.readLine()) != null) {
             String[] information = line.split(",");
@@ -113,6 +116,7 @@ public class CSVReader<T> {
     {
         RoomService roomService = RoomService.getInstance();
         List<Hotel> hotels = new ArrayList<>();
+        bufferedReader.readLine();
         String line;
         while ((line = bufferedReader.readLine()) != null) {
             String[] information = line.split(",");
@@ -132,6 +136,7 @@ public class CSVReader<T> {
     private List<HotelManager> readHotelManagers (BufferedReader bufferedReader) throws IOException {
         HotelService hotelService = HotelService.getInstance();
         List<HotelManager> hotelManagers = new ArrayList<>();
+        bufferedReader.readLine();
         String line;
         while ((line = bufferedReader.readLine()) != null) {
             String[] information = line.split(",");

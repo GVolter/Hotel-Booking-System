@@ -17,15 +17,20 @@ public class AuditService {
     private AuditService(){
         try{
             Path path = Path.of("resources\\audit.csv");
+            String header = "";
             if (!Files.exists(path)) {
                 try {
                     Files.createFile(path);
+                    header = "actionTime,action\n";
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
                 }
             }
             this.bufferedWriter = Files.newBufferedWriter(path, StandardOpenOption.APPEND);
-
+            if(!header.isEmpty()) {
+                bufferedWriter.write(header);
+                bufferedWriter.flush();
+            }
         }
         catch (IOException e){
             System.out.println(e.getMessage());
@@ -38,7 +43,7 @@ public class AuditService {
 
     public void logMessage(String actionName){
         try{
-            bufferedWriter.write(String.format("%s: %s\n", LocalDateTime.now().format(DATE_FORMATTER), actionName));
+            bufferedWriter.write(String.format("%s, %s\n", LocalDateTime.now().format(DATE_FORMATTER), actionName));
             bufferedWriter.flush();
         }
         catch (IOException e){
