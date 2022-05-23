@@ -22,6 +22,8 @@ public class LoginService {
         return instance;
     }
 
+    AuditService auditService = AuditService.getInstance();
+
     private final Scanner scanner  = new Scanner(System.in);
 
     private List<User> users = new ArrayList<>();
@@ -108,6 +110,7 @@ public class LoginService {
                             }
                             else {
                                 if (user.getPassword().equals(password)) {
+                                    auditService.logMessage("Logged in user" + user.getUsername());
                                     if (user instanceof Admin) {
                                         AdminService adminService = AdminService.getInstance();
                                         adminService.displayMenu();
@@ -134,7 +137,18 @@ public class LoginService {
                                     tries++;
                                     System.out.printf("%d more attempt(s)\n", 3-tries);
                                     System.out.println("1. Go back\n2. Try more");
-                                    int input = scanner.nextInt();
+                                    int input;
+                                    while (true)
+                                    {
+                                        try {
+                                            input = scanner.nextInt();
+                                            break;
+                                        }
+                                        catch(Exception e) {
+                                            System.out.println("Invalid option");
+                                            scanner.nextLine();
+                                        }
+                                    }
                                     if(input == 1)
                                         break;
                                 }
@@ -209,6 +223,9 @@ public class LoginService {
                 }
                 if(!taken) {
                     System.out.println("Creating user...Done");
+                    auditService.logMessage("Signed up user" + customer.getUsername());
+                    CustomerService customerService = CustomerService.getInstance();
+                    customerService.write(customer);
                     getCustomers().add(customer);
                     getUsers().add(customer);
                 }
@@ -220,15 +237,24 @@ public class LoginService {
                 System.out.println("Name");
                 String name = scanner.next();
                 System.out.println("How many rooms do you want to add?");
-                int noRooms = scanner.nextInt();
-                for(int i = 0; i < noRooms; i++)
+                int noRooms;
+                while (true)
+                {
+                    try {
+                        noRooms = scanner.nextInt();
+                        break;
+                    }
+                    catch(Exception e) {
+                        System.out.println("Invalid option");
+                        scanner.nextLine();
+                    }
+                }
+                for(int i = 1; i <= noRooms; i++)
                 {
                     Room room = roomService.createRoom(i);
                     rooms.add(room);
                 }
                 Hotel hotel = new Hotel(name, rooms);
-                HotelService hotelService = HotelService.getInstance();
-                hotelService.getHotels().add(hotel);
                 HotelManager hotelManager = new HotelManager(firstName, lastName, username, email, password, hotel);
                 for(User user: getUsers())
                 {
@@ -245,9 +271,17 @@ public class LoginService {
 
                 }
                 if(!taken) {
-                    System.out.println("Hotel added to reservation system");
+                    HotelService hotelService = HotelService.getInstance();
+                    HotelManagerService hotelManagerService = HotelManagerService.getInstance();
+                    hotelService.getHotels().add(hotel);
+                    hotelService.write(hotel);
+                    auditService.logMessage("Hotel added");
                     getHotelManagers().add(hotelManager);
+                    hotelManagerService.write(hotelManager);
                     getUsers().add(hotelManager);
+                    auditService.logMessage("HotelManager Signed up");
+                    System.out.println("Hotel added to reservation system");
+
                 }
                 break;
             default:

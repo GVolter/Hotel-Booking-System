@@ -1,0 +1,4 @@
+id,roomNo,roomFloor,price,type,availability
+1,1,1,150.0,SINGLE,true
+2,2,1,210.5,TRIPLE,true
+4,2,1,140.0,DOUBLE,true
