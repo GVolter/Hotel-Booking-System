@@ -3,7 +3,11 @@ package com.company.services;
 import com.company.model.hotel.Hotel;
 import com.company.model.reservation.Reservation;
 import com.company.model.room.Room;
+import com.company.model.room.StandardRoom;
+import com.company.model.room.Suite;
 import com.company.model.user.Customer;
+import com.company.repository.SRRepository;
+import com.company.repository.SuiteRepository;
 
 import java.util.*;
 
@@ -68,9 +72,18 @@ public class ReservationService {
                 if (r.getRoomNo() == roomNo && r.isAvailable()) {
                     roomsToBook.put(r, days);
                     r.setAvailable(false);
+                    if(r instanceof StandardRoom) {
+                        SRRepository srRepository = SRRepository.getInstance();
+                        srRepository.updateStandardRoom(String.valueOf(r.isAvailable()), r.getId());
+                    }
+                    else if(r instanceof Suite) {
+                        SuiteRepository suiteRepository = SuiteRepository.getInstance();
+                        suiteRepository.updateSuite(String.valueOf(r.isAvailable()), r.getId());
+                    }
                     System.out.println("Room booked " + roomNo);
                     break;
-                } else {
+                }
+                else if (r == hotel.getRooms().last()){
                     System.out.println("Room can't be booked or doesn't exit. Try again");
                     break;
                 }
@@ -104,6 +117,14 @@ public class ReservationService {
                 System.out.println("Reservation canceled");
                 for (Map.Entry<Room, Integer> entry : reservation.getBookedRooms().entrySet()) {
                     entry.getKey().setAvailable(true);
+                    if(entry.getKey() instanceof StandardRoom) {
+                        SRRepository srRepository = SRRepository.getInstance();
+                        srRepository.updateStandardRoom(String.valueOf(entry.getKey().isAvailable()), entry.getKey().getId());
+                    }
+                    else if(entry.getKey() instanceof Suite) {
+                        SuiteRepository suiteRepository = SuiteRepository.getInstance();
+                        suiteRepository.updateSuite(String.valueOf(entry.getKey().isAvailable()), entry.getKey().getId());
+                    }
                 }
                 customerService.displayMenu(customer);
             } else {

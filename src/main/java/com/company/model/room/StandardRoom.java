@@ -9,6 +9,11 @@ public class StandardRoom extends Room{
         this.type = type;
     }
 
+    public StandardRoom(int noOfRoom, int roomFloor, double price, boolean isAvailable, StandardRoomType type) {
+        super(noOfRoom, roomFloor, price, isAvailable);
+        this.type = type;
+    }
+
     public StandardRoomType getType() {
         return type;
     }

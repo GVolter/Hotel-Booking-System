@@ -2,6 +2,7 @@ package com.company.services;
 
 import com.company.model.hotel.Hotel;
 import com.company.model.user.Customer;
+import com.company.repository.CustomerRepository;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -24,6 +25,7 @@ public class CustomerService {
     private final Scanner scanner  = new Scanner(System.in);
     LoginService loginService = LoginService.getInstance();
     HotelService hotelService = HotelService.getInstance();
+    AuditService auditService = AuditService.getInstance();
 
     public void displayMenu(Customer customer) {
         System.out.println("Logged in as Customer");
@@ -67,9 +69,15 @@ public class CustomerService {
                     System.out.println("Are you sure you want to delete your account? (Y/N)");
                     String input = scanner.next();
                     if (input.equals("Y")) {
+                        CustomerRepository customerRepository = CustomerRepository.getInstance();
+
                         loginService.getUsers().remove(customer);
                         loginService.getCustomers().remove(customer);
+                        customerRepository.deleteCustomer(customer.getId());
+
+                        auditService.logMessage("Account deleted: " + customer.getUsername());
                         System.out.println("Account deleted");
+
                         loginService.displayMenu();
                     }
                     else if (input.equals("N"))

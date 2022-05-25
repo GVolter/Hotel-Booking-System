@@ -16,6 +16,15 @@ public abstract class Room {
         this.price = price;
     }
 
+    public Room(int noOfRoom, int roomFloor, double price, boolean isAvailable) {
+        id_max++;
+        this.id = id_max;
+        this.roomNo = noOfRoom;
+        this.roomFloor = roomFloor;
+        this.price = price;
+        this.isAvailable = isAvailable;
+    }
+
     public int getId() {
         return id;
     }
@@ -32,7 +41,7 @@ public abstract class Room {
         this.roomNo = roomNo;
     }
 
-    public boolean isAvailable() {
+    public Boolean isAvailable() {
         return isAvailable;
     }
 
