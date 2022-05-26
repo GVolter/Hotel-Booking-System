@@ -91,8 +91,6 @@ public class Main {
         users.add(A);
         loginService.setUsers(users);
 
-        DatabaseConfiguration.closeDatabaseConnection();
-
         loginService.displayMenu();
     }
 }

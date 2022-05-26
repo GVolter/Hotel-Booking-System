@@ -3,6 +3,7 @@ package com.company.repository;
 import com.company.config.DatabaseConfiguration;
 import com.company.model.room.StandardRoom;
 import com.company.model.room.StandardRoomType;
+import com.company.services.AuditService;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,6 +20,8 @@ public class SRRepository {
         return instance;
     }
 
+    AuditService auditService = AuditService.getInstance();
+
     public void createTable() {
         String createTableSql = "CREATE TABLE IF NOT EXISTS standardRoom " +
                 "(id INT PRIMARY KEY AUTO_INCREMENT, " +
@@ -31,6 +34,8 @@ public class SRRepository {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(createTableSql)) {
             preparedStatement.execute(createTableSql);
+            auditService.logMessage("Table standardRoom created");
+            DatabaseConfiguration.closeDatabaseConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -48,6 +53,8 @@ public class SRRepository {
             preparedStatement.setString(5, String.valueOf(room.isAvailable()));
 
             preparedStatement.executeUpdate();
+            auditService.logMessage("StandardRoom inserted");
+            DatabaseConfiguration.closeDatabaseConnection();
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -76,6 +83,8 @@ public class SRRepository {
                         type
                 ));
             }
+            auditService.logMessage("StandardRooms read");
+            DatabaseConfiguration.closeDatabaseConnection();
         }
         catch (SQLException e){
             e.printStackTrace();
@@ -92,6 +101,8 @@ public class SRRepository {
             preparedStatement.setInt(2, id);
 
             preparedStatement.executeUpdate();
+            auditService.logMessage("StandardRoom updated");
+            DatabaseConfiguration.closeDatabaseConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }

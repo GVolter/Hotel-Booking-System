@@ -3,6 +3,7 @@ package com.company.repository;
 import com.company.config.DatabaseConfiguration;
 import com.company.model.hotel.Hotel;
 import com.company.model.user.HotelManager;
+import com.company.services.AuditService;
 import com.company.services.HotelService;
 
 import java.sql.Connection;
@@ -19,6 +20,7 @@ public class HMRepository {
     public static HMRepository getInstance() {
         return instance;
     }
+    AuditService auditService = AuditService.getInstance();
 
     public void createTable() {
         String createTableSql = "CREATE TABLE IF NOT EXISTS hotelManager " +
@@ -34,6 +36,8 @@ public class HMRepository {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(createTableSql)) {
             preparedStatement.execute(createTableSql);
+            auditService.logMessage("Table HotelManager creatd");
+            DatabaseConfiguration.closeDatabaseConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -53,6 +57,8 @@ public class HMRepository {
             preparedStatement.setInt(7, hotelManager.getHotel().getId());
 
             preparedStatement.executeUpdate();
+            auditService.logMessage("HotelManager inserted");
+            DatabaseConfiguration.closeDatabaseConnection();
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -79,6 +85,8 @@ public class HMRepository {
                         hotelManaged
                 ));
             }
+            auditService.logMessage("HotelManagers read");
+            DatabaseConfiguration.closeDatabaseConnection();
         }
         catch (SQLException e){
             e.printStackTrace();
@@ -95,6 +103,8 @@ public class HMRepository {
             preparedStatement.setInt(2, id);
 
             preparedStatement.executeUpdate();
+            auditService.logMessage("HotelManager updated");
+            DatabaseConfiguration.closeDatabaseConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }

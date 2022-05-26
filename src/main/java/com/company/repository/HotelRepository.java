@@ -4,6 +4,7 @@ import com.company.config.DatabaseConfiguration;
 import com.company.model.hotel.Hotel;
 import com.company.model.room.Room;
 import com.company.model.room.RoomComparator;
+import com.company.services.AuditService;
 import com.company.services.RoomService;
 
 import java.sql.Connection;
@@ -22,6 +23,8 @@ public class HotelRepository {
         return instance;
     }
 
+    AuditService auditService = AuditService.getInstance();
+
     public void createTable() {
         String createTableSql = "CREATE TABLE IF NOT EXISTS hotel " +
                 "(id INT PRIMARY KEY AUTO_INCREMENT, " +
@@ -31,6 +34,8 @@ public class HotelRepository {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(createTableSql)) {
             preparedStatement.execute(createTableSql);
+            auditService.logMessage("Table hotel created");
+            DatabaseConfiguration.closeDatabaseConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -53,6 +58,8 @@ public class HotelRepository {
                 preparedStatement.setString(2, rooms.toString());
 
                 preparedStatement.executeUpdate();
+                auditService.logMessage("Hotel inserted");
+                DatabaseConfiguration.closeDatabaseConnection();
             }
             catch (SQLException e) {
                 e.printStackTrace();
@@ -76,6 +83,8 @@ public class HotelRepository {
                 }
                 hotels.add(new Hotel(result.getString(2), rooms));
             }
+            auditService.logMessage("Hotels read");
+            DatabaseConfiguration.closeDatabaseConnection();
         }
         catch (SQLException e){
             e.printStackTrace();

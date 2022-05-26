@@ -2,6 +2,7 @@ package com.company.repository;
 
 import com.company.config.DatabaseConfiguration;
 import com.company.model.room.Suite;
+import com.company.services.AuditService;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,6 +19,8 @@ public class SuiteRepository {
         return instance;
     }
 
+    AuditService auditService = AuditService.getInstance();
+
     public void createTable() {
         String createTableSql = "CREATE TABLE IF NOT EXISTS suite " +
                 "(id INT PRIMARY KEY AUTO_INCREMENT, " +
@@ -30,6 +33,8 @@ public class SuiteRepository {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(createTableSql)) {
             preparedStatement.execute(createTableSql);
+            auditService.logMessage("Table suite created");
+            DatabaseConfiguration.closeDatabaseConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -47,6 +52,8 @@ public class SuiteRepository {
             preparedStatement.setString(5, String.valueOf(room.isAvailable()));
 
             preparedStatement.executeUpdate();
+            auditService.logMessage("Suite inserted");
+            DatabaseConfiguration.closeDatabaseConnection();
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -68,6 +75,8 @@ public class SuiteRepository {
                         result.getInt(5)
                 ));
             }
+            auditService.logMessage("Suites read");
+            DatabaseConfiguration.closeDatabaseConnection();
         }
         catch (SQLException e){
             e.printStackTrace();
@@ -84,6 +93,8 @@ public class SuiteRepository {
             preparedStatement.setInt(2, id);
 
             preparedStatement.executeUpdate();
+            auditService.logMessage("Suite updated");
+            DatabaseConfiguration.closeDatabaseConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }

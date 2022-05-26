@@ -132,7 +132,6 @@ public class RoomService {
                 write(suite);
                 auditService.logMessage("Room written to CSV file");
                 suiteRepository.insertSuite(suite);
-                auditService.logMessage("Room added in database");
                 return suite;
             } else {
                 System.out.println("Room Added");
@@ -140,7 +139,6 @@ public class RoomService {
                 write(standardRoom);
                 auditService.logMessage("Room written to CSV file");
                 srRepository.insertStandardRoom(standardRoom);
-                auditService.logMessage("Room added in database");
                 return standardRoom;
             }
 

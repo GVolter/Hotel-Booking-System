@@ -74,8 +74,6 @@ public class CustomerService {
                         loginService.getUsers().remove(customer);
                         loginService.getCustomers().remove(customer);
                         customerRepository.deleteCustomer(customer.getId());
-
-                        auditService.logMessage("Account deleted: " + customer.getUsername());
                         System.out.println("Account deleted");
 
                         loginService.displayMenu();

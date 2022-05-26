@@ -2,6 +2,7 @@ package com.company.repository;
 
 import com.company.config.DatabaseConfiguration;
 import com.company.model.user.Customer;
+import com.company.services.AuditService;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,6 +19,8 @@ public class CustomerRepository {
         return instance;
     }
 
+    AuditService auditService = AuditService.getInstance();
+
     public void createTable() {
         String createTableSql = "CREATE TABLE IF NOT EXISTS customer " +
                 "(id INT PRIMARY KEY AUTO_INCREMENT, " +
@@ -31,6 +34,8 @@ public class CustomerRepository {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(createTableSql)) {
             preparedStatement.execute(createTableSql);
+            auditService.logMessage("Table customer created");
+            DatabaseConfiguration.closeDatabaseConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -49,6 +54,8 @@ public class CustomerRepository {
             preparedStatement.setString(6, String.valueOf(customer.isBlocked()));
 
             preparedStatement.executeUpdate();
+            auditService.logMessage("Customer inserted");
+            DatabaseConfiguration.closeDatabaseConnection();
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -71,6 +78,8 @@ public class CustomerRepository {
                         result.getBoolean(7)
                 ));
             }
+            auditService.logMessage("Customers read");
+            DatabaseConfiguration.closeDatabaseConnection();
         }
         catch (SQLException e){
             e.printStackTrace();
@@ -87,6 +96,8 @@ public class CustomerRepository {
             preparedStatement.setInt(2, id);
 
             preparedStatement.executeUpdate();
+            auditService.logMessage("Customer updated");
+            DatabaseConfiguration.closeDatabaseConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -100,7 +111,8 @@ public class CustomerRepository {
 
             statement.setInt(1, id);
             statement.executeUpdate();
-
+            auditService.logMessage("Customer deleted");
+            DatabaseConfiguration.closeDatabaseConnection();
         }catch (SQLException e){
             System.out.println(e.getMessage());
         }

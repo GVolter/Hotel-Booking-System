@@ -221,7 +221,7 @@ public class LoginService {
                     Customer customer = new Customer(firstName, lastName, username, email, password);
 
                     System.out.println("Creating user...Done");
-                    auditService.logMessage("Signed up user" + customer.getUsername());
+                    auditService.logMessage("Signed up user " + customer.getUsername());
 
                     CustomerService customerService = CustomerService.getInstance();
                     customerService.write(customer);
@@ -281,14 +281,12 @@ public class LoginService {
                     hotelService.write(hotel);
                     auditService.logMessage("Hotel written to CSV file");
                     hotelRepository.insertHotel(hotel);
-                    auditService.logMessage("Hotel added to database");
 
                     getHotelManagers().add(hotelManager);
                     auditService.logMessage("HotelManager Signed up");
                     hotelManagerService.write(hotelManager);
                     auditService.logMessage("HotelManager written to CSV file");
                     hmRepository.insertHM(hotelManager);
-                    auditService.logMessage("HotelManager added to database");
                     getUsers().add(hotelManager);
                     System.out.println("Hotel added to reservation system");
 
