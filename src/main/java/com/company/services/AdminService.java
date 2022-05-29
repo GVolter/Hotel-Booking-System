@@ -5,6 +5,8 @@ import com.company.model.reservation.Reservation;
 import com.company.model.user.Customer;
 import com.company.model.user.HotelManager;
 import com.company.model.user.User;
+import com.company.repository.CustomerRepository;
+import com.company.repository.HMRepository;
 
 import java.util.Scanner;
 
@@ -20,6 +22,7 @@ public class AdminService {
     private final Scanner scanner = new Scanner(System.in);
 
     LoginService loginService = LoginService.getInstance();
+    AuditService auditService = AuditService.getInstance();
 
     public void displayMenu() {
         System.out.println("Logged in as Admin");
@@ -85,8 +88,18 @@ public class AdminService {
     private void unblockUser(User user) {
         System.out.printf("Do you want to unblock the user %s? Y/N\n", user.getUsername());
         String choice = scanner.next();
-        if (choice.equals("Y"))
+        if (choice.equals("Y")) {
             user.setBlocked(false);
+            if(user instanceof Customer) {
+                CustomerRepository customerRepository = CustomerRepository.getInstance();
+                customerRepository.updateCustomer(String.valueOf(user.isBlocked()), user.getId());
+            }
+            else if(user instanceof HotelManager) {
+                HMRepository hmRepository = HMRepository.getInstance();
+                hmRepository.updateHotelManager(String.valueOf(user.isBlocked()), user.getId());
+            }
+            auditService.logMessage("Unblocked user " + user.getUsername());
+        }
         else if (choice.equals("N"))
             return;
         else

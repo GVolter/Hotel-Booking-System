@@ -7,6 +7,7 @@ import com.company.model.user.Admin;
 import com.company.model.user.Customer;
 import com.company.model.user.HotelManager;
 import com.company.model.user.User;
+import com.company.repository.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class LoginService {
     private List<User> users = new ArrayList<>();
     private List<Customer> customers = new ArrayList<>();
     private List<HotelManager> hotelManagers = new ArrayList<>();
-    private List<Admin> admins = new ArrayList<>();
+
     public List<User> getUsers() {
         return users;
     }
@@ -52,14 +53,6 @@ public class LoginService {
 
     public void setHotelManagers(List<HotelManager> hotelManagers) {
         this.hotelManagers = hotelManagers;
-    }
-
-    public List<Admin> getAdmins() {
-        return admins;
-    }
-
-    public void setAdmins(List<Admin> admins) {
-        this.admins = admins;
     }
 
     public void displayMenu(){
@@ -110,7 +103,7 @@ public class LoginService {
                             }
                             else {
                                 if (user.getPassword().equals(password)) {
-                                    auditService.logMessage("Logged in user" + user.getUsername());
+                                    auditService.logMessage("Logged in user: " + user.getUsername());
                                     if (user instanceof Admin) {
                                         AdminService adminService = AdminService.getInstance();
                                         adminService.displayMenu();
@@ -130,6 +123,15 @@ public class LoginService {
                                 else if (tries == 2) {
                                     System.out.println("Too many attempts. User got blocked.");
                                     user.setBlocked(true);
+                                    if(user instanceof Customer) {
+                                        CustomerRepository customerRepository = CustomerRepository.getInstance();
+                                        customerRepository.updateCustomer(String.valueOf(user.isBlocked()), user.getId());
+                                    }
+                                    else if(user instanceof HotelManager) {
+                                        HMRepository hmRepository = HMRepository.getInstance();
+                                        hmRepository.updateHotelManager(String.valueOf(user.isBlocked()), user.getId());
+                                    }
+                                    auditService.logMessage("User blocked: " + user.getUsername());
                                     break;
                                 }
                                 else {
@@ -206,80 +208,86 @@ public class LoginService {
 
         switch (type) {
             case 1:
-                Customer customer = new Customer(firstName, lastName, username, email, password);
                 for(User user: getUsers())
                 {
-                    if(user.getUsername().equals(customer.getUsername()) || user.getEmail().equals(customer.getEmail()))
+                    if(user.getUsername().equals(username) || user.getEmail().equals(email))
                     {
                         System.out.println("Username or email already taken");
                         taken = true;
                         break;
                     }
-                    else
-                    {
-                        continue;
-                    }
-
                 }
                 if(!taken) {
+                    Customer customer = new Customer(firstName, lastName, username, email, password);
+
                     System.out.println("Creating user...Done");
-                    auditService.logMessage("Signed up user" + customer.getUsername());
+                    auditService.logMessage("Signed up user " + customer.getUsername());
+
                     CustomerService customerService = CustomerService.getInstance();
                     customerService.write(customer);
+                    auditService.logMessage("User written to CSV file");
+
+                    CustomerRepository customerRepository = CustomerRepository.getInstance();
+                    customerRepository.insertCustomer(customer);
+
                     getCustomers().add(customer);
                     getUsers().add(customer);
                 }
                 break;
             case 2:
-                RoomService roomService = RoomService.getInstance();
-                TreeSet<Room> rooms = new TreeSet<>(new RoomComparator());
-                System.out.println("Enter your hotel information:");
-                System.out.println("Name");
-                String name = scanner.next();
-                System.out.println("How many rooms do you want to add?");
-                int noRooms;
-                while (true)
-                {
-                    try {
-                        noRooms = scanner.nextInt();
-                        break;
-                    }
-                    catch(Exception e) {
-                        System.out.println("Invalid option");
-                        scanner.nextLine();
-                    }
-                }
-                for(int i = 1; i <= noRooms; i++)
-                {
-                    Room room = roomService.createRoom(i);
-                    rooms.add(room);
-                }
-                Hotel hotel = new Hotel(name, rooms);
-                HotelManager hotelManager = new HotelManager(firstName, lastName, username, email, password, hotel);
                 for(User user: getUsers())
                 {
-                    if(user.getUsername().equals(hotelManager.getUsername()) || user.getEmail().equals(hotelManager.getEmail()))
+                    if(user.getUsername().equals(username) || user.getEmail().equals(email))
                     {
                         System.out.println("Username or email already taken");
                         taken = true;
                         break;
                     }
-                    else
-                    {
-                        continue;
-                    }
-
                 }
                 if(!taken) {
+                    RoomService roomService = RoomService.getInstance();
+                    TreeSet<Room> rooms = new TreeSet<>(new RoomComparator());
+                    System.out.println("Enter your hotel information:");
+                    System.out.println("Name");
+                    String name = scanner.next();
+                    System.out.println("How many rooms do you want to add?");
+                    int noRooms;
+                    while (true)
+                    {
+                        try {
+                            noRooms = scanner.nextInt();
+                            break;
+                        }
+                        catch(Exception e) {
+                            System.out.println("Invalid option");
+                            scanner.nextLine();
+                        }
+                    }
+                    for(int i = 1; i <= noRooms; i++)
+                    {
+                        Room room = roomService.createRoom(i);
+                        rooms.add(room);
+                    }
+                    Hotel hotel = new Hotel(name, rooms);
+                    HotelManager hotelManager = new HotelManager(firstName, lastName, username, email, password, hotel);
+
                     HotelService hotelService = HotelService.getInstance();
                     HotelManagerService hotelManagerService = HotelManagerService.getInstance();
+                    HotelRepository hotelRepository = HotelRepository.getInstance();
+                    HMRepository hmRepository = HMRepository.getInstance();
+
                     hotelService.getHotels().add(hotel);
-                    hotelService.write(hotel);
                     auditService.logMessage("Hotel added");
+                    hotelService.write(hotel);
+                    auditService.logMessage("Hotel written to CSV file");
+                    hotelRepository.insertHotel(hotel);
+
                     getHotelManagers().add(hotelManager);
-                    hotelManagerService.write(hotelManager);
-                    getUsers().add(hotelManager);
                     auditService.logMessage("HotelManager Signed up");
+                    hotelManagerService.write(hotelManager);
+                    auditService.logMessage("HotelManager written to CSV file");
+                    hmRepository.insertHM(hotelManager);
+                    getUsers().add(hotelManager);
                     System.out.println("Hotel added to reservation system");
 
                 }

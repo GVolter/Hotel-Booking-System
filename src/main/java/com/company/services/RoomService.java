@@ -5,6 +5,12 @@ import com.company.model.room.StandardRoom;
 import com.company.model.room.StandardRoomType;
 import com.company.model.room.Room;
 import com.company.model.room.Suite;
+import com.company.model.user.Customer;
+import com.company.model.user.HotelManager;
+import com.company.repository.CustomerRepository;
+import com.company.repository.HMRepository;
+import com.company.repository.SRRepository;
+import com.company.repository.SuiteRepository;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -45,6 +51,8 @@ public class RoomService {
 
     public Room createRoom(int roomNo) {
         int option;
+        SRRepository srRepository = SRRepository.getInstance();
+        SuiteRepository suiteRepository = SuiteRepository.getInstance();
         while (true) {
             int roomFloor;
             double price;
@@ -122,13 +130,15 @@ public class RoomService {
                 System.out.println("Room Added");
                 Suite suite = new Suite(roomNo, roomFloor, price, noOfRooms);
                 write(suite);
-                auditService.logMessage("Room added in systen");
+                auditService.logMessage("Room written to CSV file");
+                suiteRepository.insertSuite(suite);
                 return suite;
             } else {
                 System.out.println("Room Added");
                 StandardRoom standardRoom = new StandardRoom(roomNo, roomFloor, price, type);
                 write(standardRoom);
-                auditService.logMessage("Room added in systen");
+                auditService.logMessage("Room written to CSV file");
+                srRepository.insertStandardRoom(standardRoom);
                 return standardRoom;
             }
 
@@ -142,7 +152,16 @@ public class RoomService {
             for (Room r : hotel.getRooms()) {
                 if (r.getRoomNo() == roomNo && !r.isAvailable()) {
                     rr = r;
-                    rr.setAvailable(false);
+                    rr.setAvailable(true);
+                    if(rr instanceof StandardRoom) {
+                        SRRepository srRepository = SRRepository.getInstance();
+                        srRepository.updateStandardRoom(String.valueOf(rr.isAvailable()), rr.getId());
+                    }
+                    else if(rr instanceof Suite) {
+                        SuiteRepository suiteRepository = SuiteRepository.getInstance();
+                        suiteRepository.updateSuite(String.valueOf(rr.isAvailable()), rr.getId());
+                    }
+                    auditService.logMessage("Room now availabe: " + rr.getRoomNo());
                     System.out.println("Room is now available");
                     return;
                 }
@@ -159,6 +178,15 @@ public class RoomService {
                 if (r.getRoomNo() == roomNo && r.isAvailable()) {
                     rr = r;
                     rr.setAvailable(false);
+                    if(rr instanceof StandardRoom) {
+                        SRRepository srRepository = SRRepository.getInstance();
+                        srRepository.updateStandardRoom(String.valueOf(rr.isAvailable()), rr.getId());
+                    }
+                    else if(rr instanceof Suite) {
+                        SuiteRepository suiteRepository = SuiteRepository.getInstance();
+                        suiteRepository.updateSuite(String.valueOf(rr.isAvailable()), rr.getId());
+                    }
+                    auditService.logMessage("Room not availabe now: " + rr.getRoomNo());
                     System.out.println("Room is no more available");
                     return;
                 }

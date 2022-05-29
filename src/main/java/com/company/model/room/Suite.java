@@ -8,6 +8,11 @@ public class Suite extends Room{
         this.noOfRooms = noOfRooms;
     }
 
+    public Suite(int noOfRoom, int roomFloor, double price, boolean isAvailable, int noOfRooms) {
+        super(noOfRoom, roomFloor, price, isAvailable);
+        this.noOfRooms = noOfRooms;
+    }
+
     public int getNoOfRooms() {
         return noOfRooms;
     }

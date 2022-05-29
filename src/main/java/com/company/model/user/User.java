@@ -20,6 +20,17 @@ public abstract class User {
         this.password = password;
     }
 
+    public User(String firstName, String lastName, String username, String email, String password, boolean isBlocked) {
+        id_max++;
+        this.id = id_max;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.isBlocked = isBlocked;
+    }
+
     public int getId() {
         return id;
     }

@@ -10,6 +10,11 @@ public class HotelManager extends User{
         this.hotel = hotel;
     }
 
+    public HotelManager(String firstName, String lastName, String username, String email, String password, boolean isBlocked, Hotel hotel) {
+        super(firstName, lastName, username, email, password, isBlocked);
+        this.hotel = hotel;
+    }
+
     public Hotel getHotel() {
         return hotel;
     }

@@ -45,9 +45,6 @@ public class HotelManagerService {
                     System.out.println(hotelManager.getHotel().getRooms());
                     break;
                 case 2:
-//                    Room room = roomService.createRoom(hotelManager.getHotel());
-//                    HotelService hotelService = HotelService.getInstance();
-//                    hotelService.addRoom(room, hotelManager.getHotel());
                     System.out.println("Enter number of the room: ");
                     int roomNo = scanner.nextInt();
                     roomService.makeRoomAvailable(hotelManager.getHotel(), roomNo);
